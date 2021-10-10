@@ -17,9 +17,9 @@ use App\Http\Controllers\AuthController;
 |
 */
 
-Route::middleware('auth:api')->get('/user', function (Request $request) {
-    return $request->user();
-});
+// Route::middleware('auth:api')->get('/user', function (Request $request) {
+//     return $request->user();
+// });
 
 // Route::get('/me', [AuthController::class, 'me']);
 
@@ -29,6 +29,29 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 // Route::put('/books{id}', [BookController::class, 'update']);
 // Route::delete('/books{id}', [BookController::class, 'destroy']);
 
-Route::resource('/books', BookController::class)->except('create', 'edit');
+//register and login 
+Route::post('/register', [AuthController::class, 'register']);
+Route::post('/login', [AuthController::class, 'login']);
 
-Route::resource('/authors', AuthorController::class)->except('create', 'edit');
+//publik route
+Route::get('/books', [BookController::class, 'index']);
+Route::get('/books{id}', [BookController::class, 'show']);
+Route::get('/books/search/{title}', [BookController::class, 'search']);
+// Route::resource('/books', BookController::class)->except('create', 'edit');
+
+Route::get('/authors', [AuthorController::class, 'index']);
+Route::get('/authors/{id}', [AuthorController::class, 'show']);
+Route::get('/authors/search/{name}', [AuthorController::class, 'search']);
+// Route::resource('/authors', AuthorController::class)->except('create', 'edit');
+
+//protected route
+Route::middleware('auth:sanctum')->group(function () {
+    Route::post('/books', [BookController::class, 'store']);
+    Route::put('/books/{id}', [BookController::class, 'update']);
+    Route::delete('/books/{id}', [BookController::class, 'destroy']);
+
+    Route::post('/authors', [AuthorController::class, 'store']);
+    Route::put('/authors/{id}', [AuthorController::class, 'update']);
+    Route::delete('/authors/{id}', [AuthorController::class, 'destroy']);
+    Route::post('/logout', [AuthController::class, 'logout']);
+});
